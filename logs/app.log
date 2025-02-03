@@ -1,3 +1,6 @@
 [34m[2025-02-03T13:15:05.016Z], INFO: Info message[39m 
 [34m[2025-02-03T13:15:05.019Z], INFO: Warning message[39m 
 [34m[2025-02-03T13:15:05.019Z], INFO: Error message[39m 
+[34m[2025-02-03T13:18:54.845Z], INFO: Info message[39m 
+[33m[2025-02-03T13:18:54.847Z], WARNING: Warning message[39m 
+[31m[2025-02-03T13:18:54.847Z], ERROR: Error message[39m 

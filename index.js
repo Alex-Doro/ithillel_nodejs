@@ -25,13 +25,13 @@ emitter.on(levels.INFO, msg => {
 
 emitter.on(levels.WARNING, msg => {
   process.nextTick(() => {
-    logger.info(msg);
+    logger.warning(msg);
   });
 });
 
 emitter.on(levels.ERROR, msg => {
   process.nextTick(() => {
-    logger.info(msg);
+    logger.error(msg);
   });
 });
 
