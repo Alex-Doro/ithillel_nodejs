@@ -1,54 +1,39 @@
-import Logger from "./logger/logger.js";
-import levels from "./logger/levels.js";
+import fs from "node:fs";
+import { pipeline, Readable } from "node:stream";
+import path from "node:path";
+
+import { LogFormatTransformStream } from "./logger/log-format-stream.js";
 import EventEmitter from "./emitter.js";
+import levels from "./logger/levels.js";
 
-const logger = new Logger();
+const logPath = "logs/app.log";
+if (!fs.existsSync(path.dirname(logPath))) {
+  fs.mkdirSync(path.dirname(logPath), {
+    recursive: true,
+  });
+}
+
 const emitter = new EventEmitter();
+const readStream = new Readable({ read() {} });
+const writeStream = fs.createWriteStream(logPath);
+const transformStream = new LogFormatTransformStream();
 
-process.on("uncaughtException", err => {
-  console.log("uncaughted Exception", err.message);
-
-  process.exit(1);
-});
-
-process.on("unhandledRejection", err => {
-  console.log("unhandled Rejection", err.message);
-
-  process.exit(1);
+pipeline(readStream, transformStream, writeStream, err => {
+  console.log(err);
 });
 
 emitter.on(levels.INFO, msg => {
-  process.nextTick(() => {
-    logger.info(msg);
-  });
+  readStream.push(JSON.stringify({ type: levels.INFO, message: msg }));
 });
 
 emitter.on(levels.WARNING, msg => {
-  process.nextTick(() => {
-    logger.warning(msg);
-  });
+  readStream.push(JSON.stringify({ type: levels.WARNING, message: msg }));
 });
 
 emitter.on(levels.ERROR, msg => {
-  process.nextTick(() => {
-    logger.error(msg);
-  });
+  readStream.push(JSON.stringify({ type: levels.ERROR, message: msg }));
 });
 
 emitter.emit(levels.INFO, "Info message");
 emitter.emit(levels.WARNING, "Warning message");
 emitter.emit(levels.ERROR, "Error message");
-
-// const buffer = Buffer.from("Hello World")
-// const base64 = buffer.toString('base64')
-
-// const decode = Buffer.from(base64, 'base64')
-// console.log(decode.toString('utf8'))
-// console.log(decode.toString('hex'))
-// console.log(decode.toString(''))
-// console.log(buffer)
-
-// const buffer = Buffer.alloc(8)
-
-// buffer.write("Hello")
-// console.log(buffer.toString('utf8'))
